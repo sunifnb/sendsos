@@ -1,0 +1,70 @@
+<ion-header>
+  <ion-navbar> 
+     <ion-title>
+      Shield V6.5
+    </ion-title>
+    <ion-buttons end *ngIf="this.showSOS">
+        <button ion-button icon-only (click)="onEditProfileHandler()"><ion-icon name="person"></ion-icon></button>
+    </ion-buttons>      
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <div *ngIf="showSignIn || isUpdateProfile">
+        <div class="photo-profile-container">
+            <img *ngIf="!base64image" src="assets/imgs/default-photo.jpg" (click)="selectPhoto()" class="profile-photo" />
+            <img *ngIf="base64image" src="{{base64image}}" (click)="selectPhoto()" class="profile-photo" />        
+        </div>
+        <br /><br />                    
+        <form [formGroup]="signInForm" class="form-group">
+          <label><strong>Full Name:</strong></label>
+          <ion-input type="text" name="fullname" placeholder="Full Name" formControlName="fullname" value="{{signInUser.fullname}}"></ion-input>
+           <label><strong>Mobile Number:</strong></label>
+          <ion-input type="text" pattern="[0-9]*" name="mobilenumber" placeholder="Mobile Number" formControlName="mobilenumber" value="{{signInUser.mobilenumber}}"></ion-input>
+          <label><strong>Address:</strong></label>
+          <ion-input type="text" name="address" placeholder="Full Address" formControlName="address" value="{{signInUser.address}}"></ion-input>
+          <label><strong>Emergency Contact:</strong></label>
+          <ion-input type="text" name="emgcontactperson" placeholder="Contact Person" formControlName="emgcontactperson" value="{{signInUser.emgcontactperson}}"></ion-input>
+          <label><strong>Emergency Contact Mobile Number:</strong></label>
+          <ion-input type="text" pattern="[0-9]*" name="emgcontactnumber" placeholder="Mobile Number" formControlName="emgcontactnumber" value="{{signInUser.emgcontactnumber}}"></ion-input>
+          <br />
+          <button ion-button (click)="onSignInHandler()" small round [disabled]="!signInForm.valid">
+            <span *ngIf="showSignIn">Sign Up</span>
+            <span *ngIf="isUpdateProfile">Update Profile</span>
+          </button>  
+      </form>
+  </div>
+  <div *ngIf="showSOS">
+    <p>Welcome {{signInUser.fullname}}!!</p>
+    <p>If there is an emergency, press SOS button 3 times.</p>
+    <form [formGroup]="sosForm" class="form-group">
+        <ion-item>
+            <ion-label>Situation</ion-label>
+            <ion-select name="situation" formControlName="situation">
+                <ion-option value="Help Me">Help Me</ion-option>
+                <ion-option value="Fire">Fire</ion-option>
+                <ion-option value="Fload">Fload</ion-option>
+                <ion-option value="Eve-Teasing">Eve-Teasing</ion-option>
+                <ion-option value="Accident">Accident</ion-option>
+                <ion-option value="Emergency">Emergency</ion-option>
+                <ion-option value="Test">Test</ion-option>
+            </ion-select>
+        </ion-item>
+        <ion-grid>
+            <ion-row>
+                <ion-col col-1><ion-checkbox name="callback" formControlName="callback" (click)="onCallBackHandler()"></ion-checkbox></ion-col>
+                <ion-col>Please call back</ion-col>
+            </ion-row>
+        </ion-grid>         
+    </form>
+    <p style="text-align: center">
+        <img src="assets/imgs/sos1.png" *ngIf="showSOS1" />
+        <img src="assets/imgs/sos2.png" *ngIf="showSOS2" />
+        &nbsp;<img src="assets/imgs/sos3.png" *ngIf="showSOS3" />
+        <br />
+        <img src="assets/imgs/sos-button-normal.jpg" id="sosbutton" (click)="onSOSHandler($event)" />
+    </p>
+    <p *ngIf="displayInfo" innerHTML="{{sosInfo}}"></p>
+  
+</div>
+</ion-content>

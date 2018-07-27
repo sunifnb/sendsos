@@ -1,0 +1,8 @@
+{
+  "name": "tnsossend",
+  "app_id": "tnsossend",
+  "type": "ionic-angular",
+  "integrations": {
+    "cordova": {}
+  }
+}
