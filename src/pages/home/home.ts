@@ -12,6 +12,7 @@ import { AngularFireDatabase } from 'angularfire2/database';
 
 import { Camera, CameraOptions } from '@ionic-native/camera';
 
+import * as firebase from 'firebase';
  
 @Component({
   selector: 'page-home',
@@ -42,7 +43,7 @@ export class HomePage {
 
   fireUserList;
   userList = []; 
-
+ 
   alertMessage = {
     deviceid : null,
     fullname : null,
@@ -69,16 +70,46 @@ export class HomePage {
     address : null,
     emgcontactperson : null,
     emgcontactnumber : null 
-  };
+  }; 
+
+  formFields = [ 
+    "fullname",
+    "mobilenumber",
+    "address",
+    "emgcontactperson",
+    "emgcontactnumber" 
+  ];
+  
+  validation_messages = {
+    'fullname': [
+        { type: 'required', message: 'Name is required.' }
+      ],
+      'mobilenumber': [
+        { type: 'required', message: 'Mobile number is required.' },
+        { type: 'pattern', message: 'Mobile number must contain only numbers.' },
+        { type: 'minlength', message: 'Mobile number must be at least 10 characters long.' }        
+      ], 
+      'address': [
+        { type: 'required', message: 'Contact Address is required.' }         
+      ], 
+      'emgcontactperson': [
+        { type: 'required', message: 'Emergency Contact Name is required.' }         
+      ], 
+      'emgcontactnumber': [
+        { type: 'required', message: 'Emergency Contact mobile number is required.' },
+        { type: 'pattern', message: 'Emergency Contact mobile number must contain only numbers.' },
+        { type: 'minlength', message: 'Emergency Contact Mobile number must be at least 10 characters long.' }        
+      ]
+    }
 
   sosElement = {
     situation : null,
-    callback : false
+    callback : false 
   };  
    
   constructor(private geolocation: Geolocation,  
               private toaster : ToastController,
-              private firebasedb : AngularFireDatabase,
+              private angularFireDatabase : AngularFireDatabase,
               private formBuilder : FormBuilder,
               private network : Network,
               private storage : Storage,
@@ -88,10 +119,10 @@ export class HomePage {
  
       this.signInForm = formBuilder.group({
          "fullname" : [null, [Validators.required]],
-         "mobilenumber" : [null],
-         "address" : [],
-         "emgcontactperson" : [],
-         "emgcontactnumber" : []
+         "mobilenumber" : [null, [Validators.required]],
+         "address" : [null, [Validators.required]],
+         "emgcontactperson" : [null, [Validators.required]],
+         "emgcontactnumber" : [null, [Validators.required]]
       });
 
       this.sosForm = formBuilder.group({
@@ -290,8 +321,18 @@ export class HomePage {
   deg2rad(deg : any) {
     return deg * (Math.PI/180)
   }  
+
+  onSOSHandler() {
+    this.sosInfo = "";
+    let datenow = firebase.database.ServerValue.TIMESTAMP;
+    console.log(JSON.stringify(datenow));
+    this.sosInfo += "<br />firebase datenow : " + datenow;
+    this.sosInfo += "<br />Date.now : " + Date.now()
+    this.sosInfo += "<br />new Date : " + new Date()
+    this.displayInfo = true;
+  }
     
-  onSOSHandler(event : any) {
+  onSOSHandler1(event : any) {
     if (this.sosCounter == 0) {
       this.showSOS1 = false;
       this.showSOS2 = false;
@@ -344,8 +385,8 @@ export class HomePage {
                 "altitude" : altitude,
                 "location" : "Chennai",
                 "status" : "open",
-                "timestamp" : dt.getDate() + "-" + dt.getMonth() + "-" + dt.getFullYear() + " " + dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds()  
-                };
+                "timestamp" : dt.getDate() + "-" + (dt.getMonth() + 1) + "-" + dt.getFullYear() + " " + dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds(),  
+              };
 
              console.log(userData);  
              this.userService.saveUser(userData, this.base64image);
@@ -353,8 +394,16 @@ export class HomePage {
                 message : "Request successfully submitted!!! ",
                 duration : 3000
               }).present();
-              event.target.src = "assets/imgs/sos-button-normal.jpg";          
-              this.findNearestOfficer(userData);  
+              event.target.src = "assets/imgs/sos-button-normal.jpg"; 
+              
+              this.sosCounter = 0;
+              this.showSOS1 = false;
+              this.showSOS2 = false;
+              this.showSOS3 = false;
+ 
+             /* Disabled as per new requirement 
+              this.findNearestOfficer(userData);
+             */  
             }).catch((error) => {
               console.log('Error getting location', error);
               this.sosInfo = "Error: " + error.message;
@@ -389,12 +438,12 @@ export class HomePage {
   getSOSTime() {
     let dt = new Date();
     dt.setSeconds(dt.getSeconds() - 30);
-    return this.getDecimal(dt.getFullYear()) + "" + this.getDecimal(dt.getMonth()) + this.getDecimal(dt.getDate()) + this.getDecimal(dt.getHours()) + this.getDecimal(dt.getMinutes()) + this.getDecimal(dt.getSeconds())    
+    return this.getDecimal(dt.getFullYear()) + "" + this.getDecimal(dt.getMonth() + 1) + this.getDecimal(dt.getDate()) + this.getDecimal(dt.getHours()) + this.getDecimal(dt.getMinutes()) + this.getDecimal(dt.getSeconds())    
   }
  
   getCurrentTime() {
     let dt = new Date();
-    return this.getDecimal(dt.getFullYear()) + "" + this.getDecimal(dt.getMonth()) + this.getDecimal(dt.getDate()) + this.getDecimal(dt.getHours()) + this.getDecimal(dt.getMinutes()) + this.getDecimal(dt.getSeconds())    
+    return this.getDecimal(dt.getFullYear()) + "" + this.getDecimal(dt.getMonth() + 1) + this.getDecimal(dt.getDate()) + this.getDecimal(dt.getHours()) + this.getDecimal(dt.getMinutes()) + this.getDecimal(dt.getSeconds())    
   } 
 
   getDecimal(dt : any) {

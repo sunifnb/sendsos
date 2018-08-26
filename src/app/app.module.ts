@@ -16,7 +16,13 @@ import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { IonicStorageModule } from '@ionic/storage';
 import { Camera } from '@ionic-native/camera';
 
-var config = { 
+var config = {
+  apiKey: "AIzaSyAQS1S2W0IaQzG2PNAqcBWdz4lxdtEUbn0",
+  authDomain: "ng-users-59dfc.firebaseapp.com",
+  databaseURL: "https://ng-users-59dfc.firebaseio.com",
+  projectId: "ng-users-59dfc",
+  storageBucket: "ng-users-59dfc.appspot.com",
+  messagingSenderId: "987852749716"
 };
  
 @NgModule({

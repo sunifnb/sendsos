@@ -32,7 +32,7 @@ export class UserService {
   }
 
   sendAlert(alertMessage : any) {
-    let firedata = firebase.database().ref('/sosalerts')
+    let firedata = firebase.database().ref('/sosalerts');
     firedata.push(alertMessage);     
   }
  

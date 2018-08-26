@@ -1,8 +1,14 @@
 <ion-header>
   <ion-navbar> 
-     <ion-title>
-      Shield V6.5
+     <ion-title *ngIf="showSOS">
+      Shield V8.0
     </ion-title>
+    <ion-title *ngIf="showSignIn">
+      Add Profile
+    </ion-title>
+    <ion-title *ngIf="isUpdateProfile">
+      Update Profile
+    </ion-title>     
     <ion-buttons end *ngIf="this.showSOS">
         <button ion-button icon-only (click)="onEditProfileHandler()"><ion-icon name="person"></ion-icon></button>
     </ion-buttons>      
@@ -11,52 +17,76 @@
 
 <ion-content padding>
   <div *ngIf="showSignIn || isUpdateProfile">
-        <div class="photo-profile-container">
+        <div class="signin-photo-style">
             <img *ngIf="!base64image" src="assets/imgs/default-photo.jpg" (click)="selectPhoto()" class="profile-photo" />
             <img *ngIf="base64image" src="{{base64image}}" (click)="selectPhoto()" class="profile-photo" />        
-        </div>
-        <br /><br />                    
-        <form [formGroup]="signInForm" class="form-group">
-          <label><strong>Full Name:</strong></label>
-          <ion-input type="text" name="fullname" placeholder="Full Name" formControlName="fullname" value="{{signInUser.fullname}}"></ion-input>
-           <label><strong>Mobile Number:</strong></label>
-          <ion-input type="text" pattern="[0-9]*" name="mobilenumber" placeholder="Mobile Number" formControlName="mobilenumber" value="{{signInUser.mobilenumber}}"></ion-input>
-          <label><strong>Address:</strong></label>
-          <ion-input type="text" name="address" placeholder="Full Address" formControlName="address" value="{{signInUser.address}}"></ion-input>
-          <label><strong>Emergency Contact:</strong></label>
-          <ion-input type="text" name="emgcontactperson" placeholder="Contact Person" formControlName="emgcontactperson" value="{{signInUser.emgcontactperson}}"></ion-input>
-          <label><strong>Emergency Contact Mobile Number:</strong></label>
-          <ion-input type="text" pattern="[0-9]*" name="emgcontactnumber" placeholder="Mobile Number" formControlName="emgcontactnumber" value="{{signInUser.emgcontactnumber}}"></ion-input>
-          <br />
-          <button ion-button (click)="onSignInHandler()" small round [disabled]="!signInForm.valid">
-            <span *ngIf="showSignIn">Sign Up</span>
-            <span *ngIf="isUpdateProfile">Update Profile</span>
-          </button>  
-      </form>
+            <div *ngIf="!base64image" class="signin-photo-style-change">Change</div>
+        </div> 
+        <div class="validation-errors" style="margin-bottom: 10px; font-size: 11px; color: #ff0000;">
+            <ng-container *ngFor="let formField of formFields" >
+                <ng-container *ngFor="let validation of validation_messages[formField]" >
+                    <div class="error-message" *ngIf="signInForm.get(formField).hasError(validation.type) && (signInForm.get(formField).dirty || signInForm.get(formField).touched)">
+                        {{ validation.message }}
+                    </div>
+                </ng-container>
+            </ng-container>
+        </div> 
+        <div class="signin-style">
+            <form [formGroup]="signInForm" class="form-group"> 
+                <ion-item class="signin-input">
+                    <ion-label color="primary" fixed>Name</ion-label>
+                    <ion-input type="text" placeholder="Full Name" formControlName="fullname" value="{{signInUser.fullname}}"></ion-input>
+                </ion-item>
+                <ion-item class="signin-input">
+                    <ion-label color="primary" fixed>Mobile</ion-label>
+                    <ion-input type="tel" placeholder="Number" pattern="[0-9]*" name="mobilenumber" minlength="10" maxlength="10" formControlName="mobilenumber" value="{{signInUser.mobilenumber}}"></ion-input>
+                </ion-item>
+                <ion-item class="signin-input">
+                    <ion-label color="primary" fixed>Address</ion-label>
+                    <ion-input type="text" placeholder="Full Address" name="address" formControlName="address" value="{{signInUser.address}}"></ion-input>
+                </ion-item>
+                <ion-item class="signin-input">
+                    <ion-label color="primary" fixed>Emergency</ion-label>
+                    <ion-input type="text" placeholder="Contact Name" name="emgcontactperson" formControlName="emgcontactperson" value="{{signInUser.emgcontactperson}}"></ion-input>
+                </ion-item>
+                <ion-item class="signin-input">
+                    <ion-label color="primary" fixed>Emergency</ion-label>
+                    <ion-input type="tel" placeholder="Contact Number" pattern="[0-9]*" name="emgcontactnumber" minlength="10" maxlength="10" formControlName="emgcontactnumber" value="{{signInUser.emgcontactnumber}}"></ion-input>
+                </ion-item>
+                <br />
+                <button ion-button round (click)="onSignInHandler()" [disabled]="!signInForm.valid">
+                    <span *ngIf="showSignIn">Sign Up</span>
+                    <span *ngIf="isUpdateProfile">Update Profile</span>
+                </button>  
+            </form>
+        </div>    
   </div>
   <div *ngIf="showSOS">
     <p>Welcome {{signInUser.fullname}}!!</p>
     <p>If there is an emergency, press SOS button 3 times.</p>
-    <form [formGroup]="sosForm" class="form-group">
-        <ion-item>
-            <ion-label>Situation</ion-label>
-            <ion-select name="situation" formControlName="situation">
-                <ion-option value="Help Me">Help Me</ion-option>
-                <ion-option value="Fire">Fire</ion-option>
-                <ion-option value="Fload">Fload</ion-option>
-                <ion-option value="Eve-Teasing">Eve-Teasing</ion-option>
-                <ion-option value="Accident">Accident</ion-option>
-                <ion-option value="Emergency">Emergency</ion-option>
-                <ion-option value="Test">Test</ion-option>
-            </ion-select>
-        </ion-item>
-        <ion-grid>
-            <ion-row>
-                <ion-col col-1><ion-checkbox name="callback" formControlName="callback" (click)="onCallBackHandler()"></ion-checkbox></ion-col>
-                <ion-col>Please call back</ion-col>
-            </ion-row>
-        </ion-grid>         
-    </form>
+    <div class="sos-style">
+        <form [formGroup]="sosForm" class="form-group">
+            <ion-item>
+                <ion-label>Situation</ion-label>
+                <ion-select name="situation" formControlName="situation">
+                    <ion-option value="Help Me">Help Me</ion-option>
+                    <ion-option value="Fire">Fire</ion-option>
+                    <ion-option value="Fload">Fload</ion-option>
+                    <ion-option value="Eve-Teasing">Eve-Teasing</ion-option>
+                    <ion-option value="Accident">Accident</ion-option>
+                    <ion-option value="Emergency">Emergency</ion-option>
+                    <ion-option value="Test">Test</ion-option>
+                </ion-select>
+            </ion-item>
+            <br />
+            <ion-grid>
+                <ion-row>
+                    <ion-col col-1><ion-checkbox name="callback" formControlName="callback" (click)="onCallBackHandler()"></ion-checkbox></ion-col>
+                    <ion-col>Please call back</ion-col>
+                </ion-row>
+            </ion-grid>         
+        </form>
+    </div>
     <p style="text-align: center">
         <img src="assets/imgs/sos1.png" *ngIf="showSOS1" />
         <img src="assets/imgs/sos2.png" *ngIf="showSOS2" />
